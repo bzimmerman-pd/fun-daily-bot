@@ -1,0 +1,39 @@
+import requests
+import datetime
+import os
+
+# Optional: Load from environment variables or Rundeck secure options
+OPENWEATHER_API_KEY = os.getenv('OPENWEATHER_API_KEY')
+CITY = "San Francisco"
+SLACK_WEBHOOK_URL = os.getenv('SLACK_WEBHOOK_URL')
+
+def get_weather():
+    url = f"https://api.openweathermap.org/data/2.5/weather?q={CITY}&appid={OPENWEATHER_API_KEY}&units=metric"
+    response = requests.get(url).json()
+    temp = response['main']['temp']
+    desc = response['weather'][0]['description']
+    return f"🌤️ Weather in {CITY}: {temp}°C, {desc}"
+
+def get_dad_joke():
+    headers = {'Accept': 'application/json'}
+    response = requests.get('https://icanhazdadjoke.com/', headers=headers).json()
+    return f"😂 Dad Joke: {response['joke']}"
+
+def get_fun_fact():
+    response = requests.get('https://uselessfacts.jsph.pl/random.json?language=en').json()
+    return f"🤓 Fun Fact: {response['text']}"
+
+def post_to_slack(message):
+    data = {"text": message}
+    requests.post(SLACK_WEBHOOK_URL, json=data)
+
+def main():
+    weather = get_weather()
+    joke = get_dad_joke()
+    fact = get_fun_fact()
+    today = datetime.datetime.now().strftime('%A, %B %d')
+    final_message = f"🎉 Happy {today}!\n\n{fact}\n\n{weather}\n\n{joke}"
+    post_to_slack(final_message)
+
+if __name__ == "__main__":
+    main()
