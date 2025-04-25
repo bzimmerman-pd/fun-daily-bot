@@ -1,8 +1,5 @@
 import requests
 import datetime
-import os
-
-SLACK_WEBHOOK_URL = os.getenv('SLACK_WEBHOOK_URL')
 
 def get_dad_joke():
     headers = {'Accept': 'application/json'}
@@ -13,16 +10,12 @@ def get_fun_fact():
     response = requests.get('https://uselessfacts.jsph.pl/random.json?language=en').json()
     return f"🤓 Fun Fact: {response['text']}"
 
-def post_to_slack(message):
-    data = {"text": message}
-    requests.post(SLACK_WEBHOOK_URL, json=data)
-
 def main():
     joke = get_dad_joke()
     fact = get_fun_fact()
     today = datetime.datetime.now().strftime('%A, %B %d')
     final_message = f"🎉 Happy {today}!\n\n{fact}\n\n{joke}"
-    post_to_slack(final_message)
+    print(final_message)
 
 if __name__ == "__main__":
     main()
